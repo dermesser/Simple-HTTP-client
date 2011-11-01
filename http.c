@@ -28,7 +28,7 @@ int main (int argc, char** argv)
 	port[5] = 0;	
 
 	if ( argc <= 2 )
-		errExit("Usage: simple-http SERVER [PORT] FILE\n\n(c) 2011 dermesser. Licensed with GNU-GPL3");
+		errExit("Usage: simple-http SERVER [PORT] FILE\n\n(c) 2011 dermesser. Licensed with GNU-GPL v3\n");
 	
 	if ( argc == 4 )
 	{
