@@ -7,6 +7,12 @@
 # include <string.h>
 # include <unistd.h>
 
+/*
+ * (c) 2011 dermesser
+ * This piece of software is licensed with GNU GPL 3.
+ *
+ */
+
 void errExit(const char* str)
 {
 	fprintf(stderr,str);
@@ -21,7 +27,7 @@ int main (int argc, char** argv)
 	
 
 	if ( argc == 1 )
-		errExit("Usage: http SERVER FILE\n");
+		errExit("Usage: simple-http SERVER FILE\n");
 
 	srvfd = socket(AF_INET,SOCK_STREAM,0);
 
