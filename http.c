@@ -23,11 +23,22 @@ int main (int argc, char** argv)
 {
 	struct addrinfo *result, hints;
 	int srvfd, rwerr = 42;
-	char request[400], c;
-	
+	char request[400], c, port[6];
 
-	if ( argc == 1 )
-		errExit("Usage: simple-http SERVER FILE\n");
+	port[5] = 0;	
+
+	if ( argc <= 2 )
+		errExit("Usage: simple-http SERVER [PORT] FILE\n");
+	
+	if ( argc == 4 )
+	{
+		strcpy(port,argv[2]); // Copy the port number from the second argument 
+		strcpy(argv[2],argv[3]); // copy the filename into the second argument that it seems as if there wasn't a third arg.
+	} else 
+	{
+		strncpy(port,"80",2);
+	}
+	
 
 	srvfd = socket(AF_INET,SOCK_STREAM,0);
 
@@ -40,7 +51,7 @@ int main (int argc, char** argv)
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 
-	if ( 0 != getaddrinfo(argv[1],"80",&hints,&result))
+	if ( 0 != getaddrinfo(argv[1],port,&hints,&result))
 		errExit("getaddrinfo\n");
 
 	if ( connect(srvfd,result->ai_addr,sizeof(struct sockaddr)) == -1)
