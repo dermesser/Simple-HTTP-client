@@ -1,0 +1,11 @@
+README for simple-http
+
+simple-http is a very simple http client, basing upon the linux/bsd sockets api.
+
+You may use it as shown here:
+
+	$ simple-http $SERVER $FILE
+e.g.
+	$ simple-http lbo.spheniscida.de /index.php
+
+simple-http terminates by itself when the server closes its socket if you don't stop it with SIGTERM.
