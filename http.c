@@ -22,8 +22,8 @@ void errExit(const char* str)
 int main (int argc, char** argv)
 {
 	struct addrinfo *result, hints;
-	int srvfd, rwerr = 42;
-	char request[400], c, port[6];
+	int srvfd, rwerr = 42, argindex;
+	char request[400], buf[16], port[6];
 
 	port[5] = 0;	
 
@@ -33,10 +33,13 @@ int main (int argc, char** argv)
 	if ( argc == 4 )
 	{
 		strcpy(port,argv[2]); // Copy the port number from the second argument 
-		strcpy(argv[2],argv[3]); // copy the filename into the second argument that it seems as if there wasn't a third arg.
-	} else 
+		argindex = 3;
+
+	}
+	if (argc == 3)
 	{
-		strncpy(port,"80",2);
+		argindex = 2;
+		strncpy(port,"80",3);
 	}
 	
 
@@ -60,14 +63,16 @@ int main (int argc, char** argv)
 	
 	// Now we have an established connection.
 	
-	sprintf(request,"GET %s HTTP/1.1\nHost: %s\nUser-agent: lbo's http client\n\n",argv[2],argv[1]);
+	sprintf(request,"GET %s HTTP/1.1\nHost: %s\nUser-agent: simple-http client\n\n",argv[argindex],argv[1]);
 
 	write(srvfd,request,strlen(request));
 	
+	shutdown(srvfd,SHUT_WR);
+
 	while ( rwerr > 0 )
 	{
-		rwerr = read(srvfd,&c,1);
-		putchar(c);
+		rwerr = read(srvfd,buf,16);
+		write(1,buf,rwerr);
 	}
 	
 	close(srvfd);
