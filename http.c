@@ -6,6 +6,7 @@
 # include <netdb.h>
 # include <string.h>
 # include <unistd.h>
+# include <fcntl.h>
 
 /*
  * (c) 2011 dermesser
@@ -22,39 +23,45 @@ void errExit(const char* str)
 int main (int argc, char** argv)
 {
 	struct addrinfo *result, hints;
-	int srvfd, rwerr = 42, argindex;
-	char request[400], buf[16], port[6];
+	int srvfd, rwerr = 42, outfile;
+	char request[400], buf[16], port[6],c;
 
-	port[5] = 0;	
+	memset(port,0,6);
 
-	if ( argc <= 2 )
-		errExit("Usage: simple-http SERVER [PORT] FILE\n\n(c) 2011 dermesser. Licensed with GNU-GPL v3\n");
+	if ( argc < 3 )
+		errExit("Usage: simple-http [-h] [-p PORT] [-o OUTPUT_FILE] SERVER FILE\n");
 	
-	if ( argc == 4 )
-	{
-		strcpy(port,argv[2]); // Copy the port number from the second argument 
-		argindex = 3;
+	strncpy(port,"80",2);
 
-	}
-	if (argc == 3)
+	while ( (c = getopt(argc,argv,"p:ho:")) >= 0 )
 	{
-		argindex = 2;
-		strncpy(port,"80",3);
+		switch (c)
+		{
+			case 'h' : 
+				printf("Usage: simple-http [-h] [-p PORT] [-o OUTPUT_FILE] SERVER FILE\n");
+				exit(0);
+			case 'p' :
+				strncpy(port,optarg,5);
+				break;
+			case 'o' :
+				outfile = open(optarg,O_WRONLY|O_CREAT,0644);
+				close(1);
+				dup2(outfile,1);
+				break;
+		}
 	}
-	
 
 	srvfd = socket(AF_INET,SOCK_STREAM,0);
 
 	if ( srvfd < 0 )
 		errExit("socket()\n");
 
-
 	memset(&hints,0,sizeof(struct addrinfo));
 
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 
-	if ( 0 != getaddrinfo(argv[1],port,&hints,&result))
+	if ( 0 != getaddrinfo(argv[optind],port,&hints,&result))
 		errExit("getaddrinfo\n");
 
 	if ( connect(srvfd,result->ai_addr,sizeof(struct sockaddr)) == -1)
@@ -63,7 +70,7 @@ int main (int argc, char** argv)
 	
 	// Now we have an established connection.
 	
-	sprintf(request,"GET %s HTTP/1.1\nHost: %s\nUser-agent: simple-http client\n\n",argv[argindex],argv[1]);
+	sprintf(request,"GET %s HTTP/1.1\nHost: %s\nUser-agent: simple-http client\n\n",argv[optind+1],argv[optind]);
 
 	write(srvfd,request,strlen(request));
 	
