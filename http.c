@@ -16,7 +16,7 @@
 
 void errExit(const char* str)
 {
-	fprintf(stderr,str);
+	perror(str);
 	exit(1);
 }
 
