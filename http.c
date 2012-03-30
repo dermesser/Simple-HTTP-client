@@ -51,20 +51,21 @@ int main (int argc, char** argv)
 		}
 	}
 
-	srvfd = socket(AF_INET,SOCK_STREAM,0);
-
-	if ( srvfd < 0 )
-		errExit("socket()\n");
-
 	memset(&hints,0,sizeof(struct addrinfo));
 
-	hints.ai_family = AF_INET;
+	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
 	if ( 0 != getaddrinfo(argv[optind],port,&hints,&result))
 		errExit("getaddrinfo\n");
 
-	if ( connect(srvfd,result->ai_addr,sizeof(struct sockaddr)) == -1)
+	// Create socket after retrieving the inet protocol to use (getaddrinfo)
+	srvfd = socket(result->ai_family,SOCK_STREAM,0);
+
+	if ( srvfd < 0 )
+		errExit("socket()\n");
+
+	if ( connect(srvfd,result->ai_addr,result->ai_addrlen) == -1)
 		errExit("connect\n");
 	
 	
