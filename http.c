@@ -23,7 +23,7 @@ void errExit(const char* str)
 int main (int argc, char** argv)
 {
 	struct addrinfo *result, hints;
-	int srvfd, rwerr = 42, outfile;
+	int srvfd, rwerr = 42, outfile, ai_family = AF_UNSPEC;
 	char request[400], buf[16], port[6],c;
 
 	memset(port,0,6);
@@ -33,7 +33,7 @@ int main (int argc, char** argv)
 	
 	strncpy(port,"80",2);
 
-	while ( (c = getopt(argc,argv,"p:ho:")) >= 0 )
+	while ( (c = getopt(argc,argv,"p:ho:46")) >= 0 )
 	{
 		switch (c)
 		{
@@ -48,12 +48,18 @@ int main (int argc, char** argv)
 				close(1);
 				dup2(outfile,1);
 				break;
+			case '4' :
+				ai_family = AF_INET;
+				break;
+			case '6' :
+				ai_family = AF_INET6;
+				break;
 		}
 	}
 
 	memset(&hints,0,sizeof(struct addrinfo));
 
-	hints.ai_family = AF_UNSPEC;
+	hints.ai_family = ai_family;
 	hints.ai_socktype = SOCK_STREAM;
 
 	if ( 0 != getaddrinfo(argv[optind],port,&hints,&result))
