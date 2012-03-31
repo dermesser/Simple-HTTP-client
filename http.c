@@ -57,16 +57,16 @@ int main (int argc, char** argv)
 	hints.ai_socktype = SOCK_STREAM;
 
 	if ( 0 != getaddrinfo(argv[optind],port,&hints,&result))
-		errExit("getaddrinfo\n");
+		errExit("getaddrinfo");
 
 	// Create socket after retrieving the inet protocol to use (getaddrinfo)
 	srvfd = socket(result->ai_family,SOCK_STREAM,0);
 
 	if ( srvfd < 0 )
-		errExit("socket()\n");
+		errExit("socket()");
 
 	if ( connect(srvfd,result->ai_addr,result->ai_addrlen) == -1)
-		errExit("connect\n");
+		errExit("connect");
 	
 	
 	// Now we have an established connection.
