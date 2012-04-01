@@ -38,7 +38,7 @@ int main (int argc, char** argv)
 		switch (c)
 		{
 			case 'h' : 
-				printf("Usage: simple-http [-h] [-p PORT] [-o OUTPUT_FILE] SERVER FILE\n");
+				printf("Usage: simple-http [-h] [-4|-6] [-p PORT] [-o OUTPUT_FILE] SERVER FILE\n");
 				exit(0);
 			case 'p' :
 				strncpy(port,optarg,5);
