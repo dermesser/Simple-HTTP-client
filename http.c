@@ -7,6 +7,7 @@
 # include <string.h>
 # include <unistd.h>
 # include <fcntl.h>
+# include <errno.h>
 
 /*
  * (c) 2011 dermesser
@@ -14,9 +15,17 @@
  *
  */
 
-void errExit(const char* str)
+const char* help_string = "Usage: simple-http [-h] [-4|-6] [-p PORT] [-o OUTPUT_FILE] SERVER FILE\n";
+
+void errExit(const char* str, char p)
 {
-	perror(str);
+	if ( p != 0 )
+	{
+		perror(str);
+	} else
+	{
+		fprintf(stderr,str);
+	}
 	exit(1);
 }
 
@@ -29,7 +38,7 @@ int main (int argc, char** argv)
 	memset(port,0,6);
 
 	if ( argc < 3 )
-		errExit("Usage: simple-http [-h] [-p PORT] [-o OUTPUT_FILE] SERVER FILE\n");
+		errExit(help_string,0);
 	
 	strncpy(port,"80",2);
 
@@ -37,9 +46,8 @@ int main (int argc, char** argv)
 	{
 		switch (c)
 		{
-			case 'h' : 
-				printf("Usage: simple-http [-h] [-4|-6] [-p PORT] [-o OUTPUT_FILE] SERVER FILE\n");
-				exit(0);
+			case 'h' :
+				errExit(help_string,0);
 			case 'p' :
 				strncpy(port,optarg,5);
 				break;
@@ -63,16 +71,16 @@ int main (int argc, char** argv)
 	hints.ai_socktype = SOCK_STREAM;
 
 	if ( 0 != getaddrinfo(argv[optind],port,&hints,&result))
-		errExit("getaddrinfo");
+		errExit("getaddrinfo",1);
 
 	// Create socket after retrieving the inet protocol to use (getaddrinfo)
 	srvfd = socket(result->ai_family,SOCK_STREAM,0);
 
 	if ( srvfd < 0 )
-		errExit("socket()");
+		errExit("socket()",1);
 
 	if ( connect(srvfd,result->ai_addr,result->ai_addrlen) == -1)
-		errExit("connect");
+		errExit("connect",1);
 	
 	
 	// Now we have an established connection.
