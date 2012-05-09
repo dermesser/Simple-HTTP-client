@@ -33,7 +33,7 @@ int main (int argc, char** argv)
 {
 	struct addrinfo *result, hints;
 	int srvfd, rwerr = 42, outfile, ai_family = AF_UNSPEC;
-	char request[400], buf[16], port[6],c;
+	char *request, buf[16], port[6],c;
 
 	memset(port,0,6);
 
@@ -85,6 +85,9 @@ int main (int argc, char** argv)
 	
 	// Now we have an established connection.
 	
+	// XXX: Change the length if request string is modified!!!
+	request = calloc(53+strlen(argv[optind+1])+strlen(argv[optind]),1);
+
 	sprintf(request,"GET %s HTTP/1.1\nHost: %s\nUser-agent: simple-http client\n\n",argv[optind+1],argv[optind]);
 
 	write(srvfd,request,strlen(request));
